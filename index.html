@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>AnRu Exam Paper Maker</title>
+  <meta name="description" content="AnRu Exam Paper Maker — Offline Hindi & English A4 MCQ Question Paper Builder">
+  <meta name="theme-color" content="#eef4ff">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="AnRu Exam">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient OriginOS 7 / iOS Liquid Glass Mesh Background (hidden on print) -->
+  <div class="ambient-bg no-print" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+  </div>
+
+  <!-- Sticky Frosted Glass App Bar (Exact clean v1 layout with AnRu Logo & Name) -->
+  <header class="app-topbar no-print">
+    <div class="topbar-inner">
+      <div class="brand-cluster">
+        <div class="brand-icon-img">
+          <img src="icons/icon-192.png" alt="AnRu Exam Paper Maker">
+        </div>
+        <div class="brand-text">
+          <h1>AnRu Exam Paper Maker</h1>
+          <div class="brand-sub">
+            <span>Hindi + English A4 Builder</span>
+            <span class="dot-sep">•</span>
+            <span id="saveStatusBadge" class="save-badge">Auto-Saved</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <button type="button" id="btnInstallApp" class="glass-btn btn-install btn-sm" title="Install AnRu Exam Paper Maker">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12"/><polyline points="7 10 12 15 17 10"/><rect x="4" y="17" width="16" height="4" rx="2"/></svg>
+          <span>Install App</span>
+        </button>
+        <button type="button" id="btnLoadSample" class="glass-btn btn-sm" title="Load 50-MCQ Hindi + English Sample Paper">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+          <span>50-MCQ Demo</span>
+        </button>
+        <button type="button" id="btnExportJson" class="glass-btn btn-sm" title="Export Backup JSON">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span class="hide-xs">Backup</span>
+        </button>
+        <button type="button" id="btnImportJson" class="glass-btn btn-sm" title="Import Backup JSON">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span class="hide-xs">Import</span>
+        </button>
+        <input type="file" id="importJsonInput" accept=".json,application/json" hidden>
+        <button type="button" id="btnQuickPrint" class="glass-btn btn-primary btn-sm" title="Print or Save as PDF">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          <span>Print PDF</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Primary 3-Tab Glass Navigation (Exact clean v1 layout) -->
+    <nav class="tab-dock" role="tablist" aria-label="Exam Maker Steps">
+      <button type="button" class="nav-tab active" data-tab="header" role="tab" aria-selected="true">
+        <span class="tab-step">1</span>
+        <span class="tab-label">Header &amp; Design<small>हेडर व डिज़ाइन</small></span>
+      </button>
+      <button type="button" class="nav-tab" data-tab="questions" role="tab" aria-selected="false">
+        <span class="tab-step">2</span>
+        <span class="tab-label">Questions<small>प्रश्न जोड़ें</small></span>
+        <span id="tabQuestionCount" class="pill-count">0</span>
+      </button>
+      <button type="button" class="nav-tab" data-tab="preview" role="tab" aria-selected="false">
+        <span class="tab-step">3</span>
+        <span class="tab-label">Live A4 Preview<small>प्रीव्यू व प्रिंट</small></span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="app-shell">
+    <!-- ==================== TAB 1: HEADER & DESIGN ==================== -->
+    <section id="panel-header" class="tab-panel active no-print" role="tabpanel">
+      <div class="grid-two-col">
+        <!-- Card 1: Editable Header & Branding -->
+        <article class="glass-card">
+          <div class="card-head">
+            <div class="card-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+            </div>
+            <div>
+              <h2>Header &amp; Branding <span class="hi-tag">शीर्षक विवरण</span></h2>
+              <p>Toggle any field ON/OFF to customize your coaching header.</p>
+            </div>
+          </div>
+
+          <div class="field-stack">
+            <div class="toggle-field">
+              <div class="field-top">
+                <label for="orgName">Organization / Coaching Name (संस्था का नाम)</label>
+                <label class="ios-switch"><input type="checkbox" id="showOrgName" checked><span class="slider"></span></label>
+              </div>
+              <input type="text" id="orgName" class="glass-input" placeholder="उदा. तर्कशील-प्रगतिशील समाज गंधपा">
+            </div>
+
+            <div class="toggle-field">
+              <div class="field-top">
+                <label for="examTitle">Exam Title (परीक्षा का नाम)</label>
+                <label class="ios-switch"><input type="checkbox" id="showExamTitle" checked><span class="slider"></span></label>
+              </div>
+              <input type="text" id="examTitle" class="glass-input" placeholder="उदा. प्रतियोगिता परीक्षा - 2025 प्रश्न-पत्र">
+            </div>
+
+            <div class="toggle-field">
+              <div class="field-top">
+                <label for="examSubtitle">Sub-title / Category (वर्ग / विषय)</label>
+                <label class="ios-switch"><input type="checkbox" id="showExamSubtitle" checked><span class="slider"></span></label>
+              </div>
+              <input type="text" id="examSubtitle" class="glass-input" placeholder="उदा. वरिष्ठ / मध्यम वर्ग परीक्षा">
+            </div>
+
+            <div class="meta-grid-3">
+              <div class="toggle-field">
+                <div class="field-top">
+                  <label for="examDate">Date (दिनांक)</label>
+                  <label class="ios-switch sm"><input type="checkbox" id="showExamDate" checked><span class="slider"></span></label>
+                </div>
+                <input type="text" id="examDate" class="glass-input" placeholder="दिनांक: 18/10/2026">
+              </div>
+
+              <div class="toggle-field">
+                <div class="field-top">
+                  <label for="examTime">Time (समय)</label>
+                  <label class="ios-switch sm"><input type="checkbox" id="showExamTime" checked><span class="slider"></span></label>
+                </div>
+                <input type="text" id="examTime" class="glass-input" placeholder="समय: 2 घंटे">
+              </div>
+
+              <div class="toggle-field">
+                <div class="field-top">
+                  <label for="maxMarks">Max Marks (पूर्णांक)</label>
+                  <label class="ios-switch sm"><input type="checkbox" id="showMaxMarks" checked><span class="slider"></span></label>
+                </div>
+                <input type="text" id="maxMarks" class="glass-input" placeholder="पूर्णांक: 100">
+              </div>
+            </div>
+
+            <div class="control-block">
+              <label class="block-label">Header Style (हेडर स्टाइल)</label>
+              <div class="segmented" id="headerStyleGroup">
+                <button type="button" class="seg-btn active" data-val="classic">Classic Underline</button>
+                <button type="button" class="seg-btn" data-val="boxed">Formal Box</button>
+                <button type="button" class="seg-btn" data-val="minimal">Clean Line</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 2: Custom Logo & Watermark Engine -->
+        <article class="glass-card">
+          <div class="card-head">
+            <div class="card-icon purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            </div>
+            <div>
+              <h2>Logo &amp; Watermark Engine <span class="hi-tag">लोगो व वॉटरमार्क</span></h2>
+              <p>Upload from gallery; watermark repeats cleanly on every printed A4 page.</p>
+            </div>
+          </div>
+
+          <div class="logo-uploader-row">
+            <div id="logoThumbBox" class="logo-thumb-box">
+              <img id="logoThumbPreview" alt="Logo preview" hidden>
+              <span id="logoThumbEmpty">No Logo</span>
+            </div>
+            <div class="logo-btn-stack">
+              <div class="btn-row">
+                <button type="button" id="btnUploadLogo" class="glass-btn btn-primary btn-sm">Upload Logo</button>
+                <button type="button" id="btnSampleLogo" class="glass-btn btn-sm">Sample Emblem</button>
+                <button type="button" id="btnRemoveLogo" class="glass-btn btn-danger-soft btn-sm">Remove</button>
+              </div>
+              <input type="file" id="logoUploadInput" accept="image/*" hidden>
+              <span class="helper-hint">PNG / JPG / SVG • Stored locally in your browser</span>
+            </div>
+          </div>
+
+          <div class="divider-soft"></div>
+
+          <div class="switch-row">
+            <div>
+              <strong>Header Logo (हेडर लोगो)</strong>
+              <small>Show logo beside or above the exam title</small>
+            </div>
+            <label class="ios-switch"><input type="checkbox" id="showHeaderLogo" checked><span class="slider"></span></label>
+          </div>
+
+          <div class="control-block">
+            <label class="block-label">Header Logo Position</label>
+            <div class="segmented" id="headerLogoPosGroup">
+              <button type="button" class="seg-btn active" data-val="left">Left</button>
+              <button type="button" class="seg-btn" data-val="center">Center</button>
+              <button type="button" class="seg-btn" data-val="right">Right</button>
+            </div>
+          </div>
+
+          <div class="range-field">
+            <div class="range-top">
+              <label for="headerLogoSize">Header Logo Size</label>
+              <span id="headerLogoSizeVal" class="range-pill">54px</span>
+            </div>
+            <input type="range" id="headerLogoSize" class="glass-range" min="32" max="90" step="2" value="54">
+          </div>
+
+          <div class="divider-soft"></div>
+
+          <div class="switch-row">
+            <div>
+              <strong>Page Watermark (वॉटरमार्क)</strong>
+              <small>Faint background seal across every A4 page</small>
+            </div>
+            <label class="ios-switch"><input type="checkbox" id="showWatermark" checked><span class="slider"></span></label>
+          </div>
+
+          <div class="range-field">
+            <div class="range-top">
+              <label for="watermarkOpacity">Watermark Opacity (पारदर्शिता)</label>
+              <span id="watermarkOpacityVal" class="range-pill">12%</span>
+            </div>
+            <input type="range" id="watermarkOpacity" class="glass-range" min="5" max="40" step="1" value="12">
+          </div>
+
+          <div class="range-field">
+            <div class="range-top">
+              <label for="watermarkSize">Watermark Size (आकार)</label>
+              <span id="watermarkSizeVal" class="range-pill">300px</span>
+            </div>
+            <input type="range" id="watermarkSize" class="glass-range" min="120" max="460" step="10" value="300">
+          </div>
+
+          <div class="range-field">
+            <div class="range-top">
+              <label for="watermarkRotation">Watermark Rotation (घुमाव)</label>
+              <span id="watermarkRotationVal" class="range-pill">0°</span>
+            </div>
+            <input type="range" id="watermarkRotation" class="glass-range" min="-45" max="45" step="1" value="0">
+          </div>
+        </article>
+
+        <!-- Card 3: Page & Column Layout Controls -->
+        <article class="glass-card">
+          <div class="card-head">
+            <div class="card-icon teal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+            </div>
+            <div>
+              <h2>Page &amp; Column Layout <span class="hi-tag">A4 लेआउट सेटिंग</span></h2>
+              <p>Optimize 50 MCQs cleanly onto 2 A4 pages (Front &amp; Back) without awkward splits.</p>
+            </div>
+          </div>
+
+          <div class="control-block">
+            <label class="block-label">Question Columns (कॉलम मोड)</label>
+            <div class="segmented" id="columnModeGroup">
+              <button type="button" class="seg-btn" data-val="1">1-Column (सिंगल)</button>
+              <button type="button" class="seg-btn active" data-val="2">2-Column (डबल)</button>
+            </div>
+          </div>
+
+          <div class="switch-row">
+            <div>
+              <strong>Center Divider Line (बीच की रेखा)</strong>
+              <small>Subtle vertical rule between columns in 2-column mode</small>
+            </div>
+            <label class="ios-switch"><input type="checkbox" id="showColumnRule"><span class="slider"></span></label>
+          </div>
+
+          <div class="control-block">
+            <label class="block-label">Print Side Mode (प्रिंट साइड)</label>
+            <div class="segmented" id="printSideModeGroup">
+              <button type="button" class="seg-btn" data-val="single">Single-Sided</button>
+              <button type="button" class="seg-btn active" data-val="double">Double-Sided (Front-Back A4)</button>
+            </div>
+          </div>
+
+          <div class="range-field">
+            <div class="range-top">
+              <label for="fontSize">Paper Font Size (फ़ॉन्ट आकार)</label>
+              <span id="fontSizeVal" class="range-pill">10.5pt</span>
+            </div>
+            <input type="range" id="fontSize" class="glass-range" min="9" max="14" step="0.5" value="10.5">
+          </div>
+
+          <div class="control-block">
+            <label class="block-label">Spacing &amp; Density (स्पेसिंग)</label>
+            <div class="segmented" id="spacingModeGroup">
+              <button type="button" class="seg-btn active" data-val="compact">Compact (सघन)</button>
+              <button type="button" class="seg-btn" data-val="normal">Normal (सामान्य)</button>
+              <button type="button" class="seg-btn" data-val="spacious">Spacious (खुला)</button>
+            </div>
+          </div>
+
+          <div class="control-block">
+            <label class="block-label">Options Style (विकल्प लेआउट)</label>
+            <div class="segmented" id="optionLayoutGroup">
+              <button type="button" class="seg-btn active" data-val="inline">Inline (a b c d)</button>
+              <button type="button" class="seg-btn" data-val="grid2">2×2 Grid</button>
+              <button type="button" class="seg-btn" data-val="stack">1 Per Line</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 4: Editable Instructions (निर्देश) Box -->
+        <article class="glass-card">
+          <div class="card-head">
+            <div class="card-icon amber">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            </div>
+            <div class="card-head-grow">
+              <h2>Instructions Box <span class="hi-tag">निर्देश</span></h2>
+              <p>Edit, add, delete, or hide exam instructions.</p>
+            </div>
+            <label class="ios-switch"><input type="checkbox" id="showInstructions" checked><span class="slider"></span></label>
+          </div>
+
+          <div id="instructionsEditorBody" class="field-stack">
+            <div>
+              <label for="instructionsTitle" class="block-label">Box Heading (शीर्षक)</label>
+              <input type="text" id="instructionsTitle" class="glass-input" placeholder="परीक्षार्थियों के लिए सामान्य निर्देश:">
+            </div>
+
+            <div id="instructionsList" class="instructions-list"></div>
+
+            <div class="add-instruction-row">
+              <input type="text" id="newInstructionInput" class="glass-input" placeholder="नया निर्देश लिखें... (Add new rule)">
+              <button type="button" id="btnAddInstruction" class="glass-btn btn-primary btn-sm">+ Add</button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="step-footer">
+        <button type="button" id="btnGoToQuestions" class="glass-btn btn-primary btn-lg">
+          Next: Add Questions (प्रश्न जोड़ें) →
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: QUESTIONS ==================== -->
+    <section id="panel-questions" class="tab-panel no-print" role="tabpanel">
+      <div class="questions-layout">
+        <!-- Left Column: Editor Card -->
+        <div class="editor-col">
+          <article class="glass-card">
+            <div class="card-head">
+              <div class="card-icon blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              </div>
+              <div>
+                <h2>Question Entry <span class="hi-tag">प्रश्न दर्ज करें</span></h2>
+                <p>Add one by one or paste a full WhatsApp / Notes list.</p>
+              </div>
+            </div>
+
+            <div class="segmented mb-16" id="qModeGroup">
+              <button type="button" class="seg-btn active" data-val="single">Single Entry (एक-एक)</button>
+              <button type="button" class="seg-btn" data-val="bulk">Fast Bulk Paste (एक साथ)</button>
+            </div>
+
+            <!-- Single Entry Mode -->
+            <div id="singleEntrySection">
+              <div id="editingBanner" class="editing-banner" hidden>
+                <span id="editingBannerText">Editing Question #1</span>
+                <button type="button" id="btnCancelEdit" class="glass-btn btn-xs">Cancel</button>
+              </div>
+
+              <div class="symbol-bar-wrap">
+                <span class="symbol-label">Math / Science Symbols:</span>
+                <div id="mathSymbolBar" class="symbol-bar">
+                  <button type="button" class="sym-btn" data-sym="²">²</button>
+                  <button type="button" class="sym-btn" data-sym="³">³</button>
+                  <button type="button" class="sym-btn" data-sym="√">√</button>
+                  <button type="button" class="sym-btn" data-sym="π">π</button>
+                  <button type="button" class="sym-btn" data-sym="°">°</button>
+                  <button type="button" class="sym-btn" data-sym="×">×</button>
+                  <button type="button" class="sym-btn" data-sym="÷">÷</button>
+                  <button type="button" class="sym-btn" data-sym="±">±</button>
+                  <button type="button" class="sym-btn" data-sym="₹">₹</button>
+                  <button type="button" class="sym-btn" data-sym="≤">≤</button>
+                  <button type="button" class="sym-btn" data-sym="≥">≥</button>
+                  <button type="button" class="sym-btn" data-sym="≠">≠</button>
+                  <button type="button" class="sym-btn" data-sym="→">→</button>
+                  <button type="button" class="sym-btn" data-sym="%">%</button>
+                </div>
+              </div>
+
+              <div class="field-stack">
+                <div>
+                  <label for="qText" class="block-label">Question Text (प्रश्न लिखें)</label>
+                  <textarea id="qText" class="glass-input glass-textarea" rows="3" placeholder="उदा. कौन सा तत्व हीरा और ग्रेफाइट दोनों में पाया जाता है?"></textarea>
+                </div>
+
+                <div class="options-edit-grid">
+                  <div class="opt-input-wrap">
+                    <span class="opt-badge">a)</span>
+                    <input type="text" id="optA" class="glass-input" placeholder="विकल्प a">
+                  </div>
+                  <div class="opt-input-wrap">
+                    <span class="opt-badge">b)</span>
+                    <input type="text" id="optB" class="glass-input" placeholder="विकल्प b">
+                  </div>
+                  <div class="opt-input-wrap">
+                    <span class="opt-badge">c)</span>
+                    <input type="text" id="optC" class="glass-input" placeholder="विकल्प c">
+                  </div>
+                  <div class="opt-input-wrap">
+                    <span class="opt-badge">d)</span>
+                    <input type="text" id="optD" class="glass-input" placeholder="विकल्प d">
+                  </div>
+                </div>
+
+                <div class="control-block">
+                  <label class="block-label">Correct Answer — Optional for Answer Key (सही उत्तर)</label>
+                  <div class="segmented" id="qAnswerGroup">
+                    <button type="button" class="seg-btn active" data-val="">None</button>
+                    <button type="button" class="seg-btn" data-val="a">a</button>
+                    <button type="button" class="seg-btn" data-val="b">b</button>
+                    <button type="button" class="seg-btn" data-val="c">c</button>
+                    <button type="button" class="seg-btn" data-val="d">d</button>
+                  </div>
+                </div>
+
+                <button type="button" id="btnSaveQuestion" class="glass-btn btn-primary btn-block">
+                  + Add Question (प्रश्न जोड़ें)
+                </button>
+              </div>
+            </div>
+
+            <!-- Fast Bulk Paste Mode -->
+            <div id="bulkPasteSection" hidden>
+              <p class="helper-hint mb-10">
+                WhatsApp या Notes से कई प्रश्न एक साथ पेस्ट करें। Supports <code>1.</code>, <code>Q1.</code>, <code>प्रश्न 1.</code>, <code>a) b) c) d)</code>, <code>(a)</code>, <code>क) ख) ग) घ)</code>, and optional <code>Ans: b</code> / <code>उत्तर: b</code>.
+              </p>
+              <textarea id="bulkText" class="glass-input glass-textarea bulk-area" rows="10" placeholder="1. कौन सा तत्व हीरा और ग्रेफाइट दोनों में पाया जाता है?
+a) सिलिकॉन b) कार्बन c) नाइट्रोजन d) ऑक्सीजन
+Ans: b
+
+2. If 2x + 5 = 15, what is the value of x²?
+(a) 5 (b) 10 (c) 25 (d) 50
+उत्तर: c"></textarea>
+
+              <div class="bulk-status-bar">
+                <span id="bulkParsePreview" class="bulk-preview-pill">0 questions detected</span>
+                <button type="button" id="btnLoadBulkExample" class="glass-btn btn-xs">Insert Format Example</button>
+              </div>
+
+              <div class="btn-row mt-12">
+                <button type="button" id="btnBulkAppend" class="glass-btn btn-primary flex-1">Add to Paper</button>
+                <button type="button" id="btnBulkReplace" class="glass-btn btn-danger-soft flex-1">Replace All</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Auto Answer Key Generator Card -->
+          <article class="glass-card mt-16">
+            <div class="switch-row">
+              <div>
+                <strong>Auto Answer Key (शिक्षक उत्तर कुंजी)</strong>
+                <small id="answerKeyStatus">Prints a clean Teacher's Answer Key table on a separate last page</small>
+              </div>
+              <label class="ios-switch"><input type="checkbox" id="showAnswerKey" checked><span class="slider"></span></label>
+            </div>
+            <div id="answerKeyTitleWrap" class="mt-12">
+              <label for="answerKeyTitle" class="block-label">Answer Key Heading</label>
+              <input type="text" id="answerKeyTitle" class="glass-input" placeholder="शिक्षक उत्तर कुंजी (Teacher's Answer Key)">
+            </div>
+          </article>
+        </div>
+
+        <!-- Right Column: Question Bank List -->
+        <article class="glass-card list-col">
+          <div class="list-header">
+            <div>
+              <h2>Question Bank <span id="questionCountLabel" class="hi-tag">0 प्रश्न</span></h2>
+              <p>Reorder, edit, or delete any question cleanly.</p>
+            </div>
+            <button type="button" id="btnClearAllQuestions" class="glass-btn btn-danger-soft btn-xs">Clear All</button>
+          </div>
+
+          <div class="search-box">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="search" id="qSearchInput" class="glass-input search-input" placeholder="Search questions... (प्रश्न खोजें)">
+          </div>
+
+          <div id="questionListContainer" class="question-list"></div>
+        </article>
+      </div>
+
+      <div class="step-footer">
+        <button type="button" id="btnBackToHeader" class="glass-btn btn-lg">← Header &amp; Design</button>
+        <button type="button" id="btnGoToPreview" class="glass-btn btn-primary btn-lg">Next: Live A4 Preview &amp; Print →</button>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: LIVE A4 PREVIEW & PRINT ==================== -->
+    <section id="panel-preview" class="tab-panel" role="tabpanel">
+      <!-- Preview Controls Toolbar (hidden on print) -->
+      <article class="glass-card preview-toolbar no-print">
+        <div class="preview-toolbar-top">
+          <div>
+            <h2>Live A4 Print Preview <span class="hi-tag">प्रिंट प्रीव्यू</span></h2>
+            <p id="previewPageEstimate" class="fit-badge">Calculating page fit...</p>
+          </div>
+          <button type="button" id="btnPrintNow" class="glass-btn btn-primary btn-lg">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            <span>Print / Save A4 PDF</span>
+          </button>
+        </div>
+
+        <div class="quick-bar">
+          <div class="quick-group">
+            <span class="quick-lbl">Columns:</span>
+            <div class="segmented sm" id="quickColumnGroup">
+              <button type="button" class="seg-btn" data-val="1">1-Col</button>
+              <button type="button" class="seg-btn active" data-val="2">2-Col</button>
+            </div>
+          </div>
+
+          <div class="quick-group">
+            <span class="quick-lbl">Density:</span>
+            <div class="segmented sm" id="quickSpacingGroup">
+              <button type="button" class="seg-btn active" data-val="compact">Compact</button>
+              <button type="button" class="seg-btn" data-val="normal">Normal</button>
+              <button type="button" class="seg-btn" data-val="spacious">Spacious</button>
+            </div>
+          </div>
+
+          <div class="quick-group">
+            <span class="quick-lbl">Preview Zoom:</span>
+            <div class="segmented sm" id="previewZoomGroup">
+              <button type="button" class="seg-btn active" data-val="fit">Fit Screen</button>
+              <button type="button" class="seg-btn" data-val="100">100%</button>
+            </div>
+          </div>
+
+          <label class="quick-check">
+            <input type="checkbox" id="quickAnswerKeyCheck" checked>
+            <span>Include Answer Key</span>
+          </label>
+        </div>
+
+        <p class="print-tip">
+          <strong>Print Tip:</strong> Print dialog में Paper Size = <strong>A4</strong> और Margins = <strong>Default / None</strong> चुनें। Printing automatically switches to crisp, ink-saving black &amp; white.
+        </p>
+      </article>
+
+      <!-- Responsive A4 Paper Viewport -->
+      <div id="a4PreviewViewport" class="a4-viewport">
+        <div id="a4PreviewFrame" class="a4-frame">
+          <div id="a4PreviewScaler" class="a4-scaler">
+            <!-- ACTUAL PRINTABLE PAPER ROOT -->
+            <div id="printPaperRoot" class="print-paper-root">
+              <!-- Repeating Watermark Layer -->
+              <div id="paperWatermarkLayer" class="paper-watermark-layer" aria-hidden="true">
+                <img id="paperWatermarkImg" alt="">
+              </div>
+
+              <!-- Main Question Paper Sheet -->
+              <div class="paper-sheet" id="paperSheetMain">
+                <header id="paperHeader" class="paper-header style-classic"></header>
+                <section id="paperInstructions" class="paper-instructions"></section>
+                <section id="paperQuestions" class="paper-questions cols-2 spacing-compact opt-inline"></section>
+                <footer class="paper-end-mark" id="paperEndMark">— समाप्त / End of Question Paper —</footer>
+              </div>
+
+              <!-- Optional Separate Printable Teacher's Answer Key -->
+              <div class="paper-sheet paper-answer-key-sheet" id="paperAnswerKeySheet" hidden>
+                <header id="answerKeyHeader" class="ak-header"></header>
+                <div id="answerKeyGrid" class="ak-grid"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Custom Frosted Glass Confirm Modal -->
+  <div id="confirmModal" class="glass-modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="glass-modal">
+      <h3 id="confirmTitle">Confirm Action</h3>
+      <p id="confirmMessage">Are you sure?</p>
+      <div class="modal-actions">
+        <button type="button" id="btnConfirmCancel" class="glass-btn">Cancel</button>
+        <button type="button" id="btnConfirmOk" class="glass-btn btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Install App Guide Modal -->
+  <div id="installGuideModal" class="glass-modal-backdrop no-print" hidden role="dialog" aria-modal="true" aria-labelledby="installGuideTitle">
+    <div class="glass-modal install-modal">
+      <div class="install-modal-head">
+        <img src="icons/icon-192.png" alt="AnRu Exam Paper Maker" class="install-modal-logo">
+        <div>
+          <h3 id="installGuideTitle">Install AnRu Exam Paper Maker</h3>
+          <span class="install-sub">Full-screen offline app on your phone</span>
+        </div>
+      </div>
+      <ol class="install-steps">
+        <li><strong>Android (Chrome):</strong> ऊपर दाईं ओर <strong>⋮ (Menu)</strong> दबाएं → <strong>"Install app"</strong> या <strong>"Add to Home screen"</strong> चुनें।</li>
+        <li><strong>iPhone (Safari):</strong> नीचे <strong>Share (↑)</strong> बटन दबाएं → <strong>"Add to Home Screen"</strong> चुनें।</li>
+      </ol>
+      <div class="modal-actions">
+        <button type="button" id="btnCloseInstallGuide" class="glass-btn btn-primary">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container no-print" aria-live="polite"></div>
+
+  <!-- Dynamic @page style tag updated by JS for Single vs Double-Sided A4 Print -->
+  <style id="dynamicPrintStyle"></style>
+
+  <script src="script.js"></script>
+</body>
+</html>
